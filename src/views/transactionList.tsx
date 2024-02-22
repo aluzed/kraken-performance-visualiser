@@ -4,7 +4,7 @@ import useKraken from "../hooks/useKraken";
 import { getTotalBalance } from "../libs/krakenReader";
 import moment from "moment";
 
-export default function TransactionList() {
+export default function TransactionListView() {
   const { sumTransactions } = useKraken();
 
   const totalBalance = getTotalBalance(sumTransactions);
@@ -22,16 +22,16 @@ export default function TransactionList() {
           {(totalBalance.totalSell - totalBalance.totalBuy).toFixed(2)}
         </Badge>
       </div>
-      <div className="flex w-full pb-8">
+      <div className="flex w-full pb-20">
         <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-              <th>Pair</th>
-              <th>Type</th>
-              <th>Date</th>
-              <th>Volume</th>
-              <th>Fee</th>
-              <th>Cost</th>
+              <th className="text-xl">Pair</th>
+              <th className="text-xl">Type</th>
+              <th className="text-xl">Date</th>
+              <th className="text-xl">Volume</th>
+              <th className="text-xl">Fee</th>
+              <th className="text-xl">Cost</th>
             </tr>
           </thead>
           <tbody>

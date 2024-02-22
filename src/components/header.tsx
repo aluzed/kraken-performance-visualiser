@@ -57,7 +57,12 @@ export default function Header() {
         <button
           className="absolute right-10 top-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           title="Close current CSV"
-          onClick={closeKrakenFile}
+          onClick={() => {
+            closeKrakenFile();
+            if (importInputRef.current) {
+              importInputRef.current.value = "";
+            }
+          }}
         >
           <IoMdClose />
         </button>

@@ -76,8 +76,24 @@ export const summarizeOrderTransactions = (
 };
 
 export const getCryptoName = (coinName: string) => {
-  return coinName.replace(//)
-}
+  return coinName.replace(/(EUR|USD|USDT)$/g, "");
+};
+
+export const getMoneyName = (coinName: string) => {
+  return coinName.match(/(EUR|USD|USDT)$/g)?.[0] ?? "";
+};
+
+type PairName = {
+  coin: string;
+  money: string;
+};
+
+export const splitPairName = (coinName: string): PairName => {
+  return {
+    coin: getCryptoName(coinName),
+    money: getMoneyName(coinName),
+  };
+};
 
 export const organizeWallet = (
   sumOrderTransactions: OrderTransactionSummarized[]
@@ -85,20 +101,31 @@ export const organizeWallet = (
   const wallet: OrganizedWallet = {};
 
   for (let ot of sumOrderTransactions) {
-    if (!wallet[ot.pair]) {
-      wallet[ot.pair] = {
-        amount: (ot.type === "buy" ? 1 : -1) * ot.totalVolume,
-        totalValue: (ot.type === "buy" ? 1 : -1) * ot.totalCost,
+    debugger;
+    const { coin, money } = splitPairName(ot.pair);
+    if (!wallet[coin]) {
+      wallet[coin] = {
+        amount: Number(
+          ((ot.type === "buy" ? 1 : -1) * ot.totalVolume).toFixed(2)
+        ),
+        totalPrice: { [money]: (ot.type === "buy" ? 1 : -1) * ot.totalCost },
         transactions: [ot],
       };
     } else {
-      wallet[ot.pair].amount += (ot.type === "buy" ? 1 : -1) * ot.totalVolume;
-      wallet[ot.pair].totalValue += (ot.type === "buy" ? 1 : -1) * ot.totalCost;
-      wallet[ot.pair].transactions.push(ot);
+      wallet[coin].amount += Number(
+        ((ot.type === "buy" ? 1 : -1) * ot.totalVolume).toFixed(2)
+      );
+      wallet[coin].transactions.push(ot);
+      const cost = (ot.type === "buy" ? 1 : -1) * ot.totalCost;
+      wallet[coin].totalPrice[money] = wallet[coin].totalPrice[money]
+        ? wallet[coin].totalPrice[money] + cost
+        : cost;
+    }
+    if (wallet[coin].amount === 0) {
+      wallet[coin].totalPrice = {};
     }
   }
 
-  debugger;
   return wallet;
 };
 

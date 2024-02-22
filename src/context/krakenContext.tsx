@@ -1,11 +1,9 @@
 import * as React from "react";
 import { TradeRaw } from "../types/trade";
 import { OrderTransactionSummarized } from "../types/orderTransactions";
+import { OrganizedWallet } from "../types/organizedWallet";
 
-export type KrakenView =
-  | "TRANSACTIONS_LIST"
-  | "TRANSACTION_PER_PAIR"
-  | "MONTH_VIEW";
+export type KrakenView = "TRANSACTIONS_LIST" | "WALLET" | "MONTH_VIEW";
 
 type KrakenData = {
   parsedData: TradeRaw[];
@@ -14,6 +12,8 @@ type KrakenData = {
   setSumTransactions: (t: OrderTransactionSummarized[]) => void;
   columns: string[];
   setColumns: (s: string[]) => void;
+  wallet: OrganizedWallet;
+  setWallet: (w: OrganizedWallet) => void;
   viewName: KrakenView;
   setViewName: (v: KrakenView) => void;
 };
@@ -25,6 +25,8 @@ export const KrakenContext = React.createContext<KrakenData>({
   setSumTransactions: () => null,
   columns: [],
   setColumns: () => null,
+  wallet: {},
+  setWallet: () => null,
   viewName: "TRANSACTIONS_LIST",
   setViewName: () => null,
 });
@@ -41,6 +43,7 @@ export const KrakenProvider = ({
   const [columns, setColumns] = React.useState<string[]>([]);
   const [viewName, setViewName] =
     React.useState<KrakenView>("TRANSACTIONS_LIST");
+  const [wallet, setWallet] = React.useState<OrganizedWallet>({});
 
   return (
     <KrakenContext.Provider
@@ -53,6 +56,8 @@ export const KrakenProvider = ({
         setColumns,
         viewName,
         setViewName,
+        wallet,
+        setWallet,
       }}
     >
       {children}

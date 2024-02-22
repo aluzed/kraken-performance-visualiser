@@ -5,6 +5,6 @@ export type OrganizedWallet = Record<
   {
     amount: number;
     transactions: OrderTransactionSummarized[];
-    totalValue: number;
+    totalPrice: Record<string, number>;
   }
 >;

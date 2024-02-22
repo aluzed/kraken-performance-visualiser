@@ -2,7 +2,9 @@ import React from "react";
 import "./App.css";
 import useKraken from "./hooks/useKraken";
 import Header from "./components/header";
-import TransactionList from "./views/transactionList";
+import TransactionListView from "./views/transactionList";
+import Footer from "./components/footer";
+import WalletView from "./views/wallet";
 
 function App() {
   const { viewName } = useKraken();
@@ -11,7 +13,10 @@ function App() {
     <div className="App">
       <Header />
 
-      {String(viewName) === "TRANSACTIONS_LIST" && <TransactionList />}
+      {String(viewName) === "TRANSACTIONS_LIST" && <TransactionListView />}
+      {String(viewName) === "WALLET" && <WalletView />}
+
+      <Footer />
     </div>
   );
 }

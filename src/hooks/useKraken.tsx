@@ -18,6 +18,8 @@ export default function useKraken() {
     setParsedData,
     setSumTransactions,
     setViewName,
+    wallet,
+    setWallet,
   } = React.useContext(KrakenContext);
 
   const updateKrakenData = (result: ParseResult<TradeRaw>) => {
@@ -26,22 +28,22 @@ export default function useKraken() {
     const orderTransactions = tradeRawToOrderTransactions(result.data);
     const sumOrderTransactions = summarizeOrderTransactions(orderTransactions);
     setSumTransactions(sumOrderTransactions);
-    organizeWallet(sumOrderTransactions);
+    setWallet(organizeWallet(sumOrderTransactions));
   };
 
   const closeKrakenFile = () => {
     setColumns([]);
     setParsedData([]);
     setSumTransactions([]);
+    setWallet({});
   };
-
-  console.log("viewName", viewName);
 
   return {
     columns,
     parsedData,
     sumTransactions,
     viewName,
+    wallet,
     setViewName,
     updateKrakenData,
     closeKrakenFile,
