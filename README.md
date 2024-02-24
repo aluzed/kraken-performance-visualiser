@@ -1,4 +1,4 @@
-# Kraken Performance Analyzer
+# Kraken Performance Visualyzer
 
 Allows you to turn Kraken CSV extraction into tables and charts that are more readable.
 
