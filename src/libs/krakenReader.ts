@@ -6,6 +6,14 @@ import {
 import { OrganizedWallet } from "../types/organizedWallet";
 import { Trade, TradeRaw, serializeTrade } from "../types/trade";
 
+export const getCryptoName = (pairName: string) => {
+  return pairName.replace(/(EUR|USD|USDT)$/g, "");
+};
+
+export const getMoneyName = (pairName: string) => {
+  return pairName.match(/(EUR|USD|USDT)$/g)?.[0] ?? "";
+};
+
 export const tradesRawToOrderTransactions = (
   tradeRawRows: TradeRaw[]
 ): OrderTransactions => {
@@ -72,14 +80,6 @@ export const summarizeOrderTransactions = (
   }
 
   return sumOrderTransactions;
-};
-
-export const getCryptoName = (pairName: string) => {
-  return pairName.replace(/(EUR|USD|USDT)$/g, "");
-};
-
-export const getMoneyName = (pairName: string) => {
-  return pairName.match(/(EUR|USD|USDT)$/g)?.[0] ?? "";
 };
 
 type PairName = {
