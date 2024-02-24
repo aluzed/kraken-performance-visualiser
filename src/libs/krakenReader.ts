@@ -5,18 +5,18 @@ import {
 import { OrganizedWallet } from "../types/organizedWallet";
 import { TradeRaw, serializeTrade } from "../types/trade";
 
-export const tradeRawToOrderTransactions = (tradeRawRows: TradeRaw[]) => {
-  const orderTransactions: OrderTransactions = {};
-
-  for (const trade of tradeRawRows) {
-    if (orderTransactions[trade.ordertxid]) {
-      orderTransactions[trade.ordertxid].push(serializeTrade(trade));
-    } else {
-      orderTransactions[trade.ordertxid] = [serializeTrade(trade)];
-    }
-  }
-
-  return orderTransactions;
+export const tradeRawToOrderTransactions = (
+  tradeRawRows: TradeRaw[]
+): OrderTransactions => {
+  return tradeRawRows.reduce(
+    (acc: OrderTransactions, curr: TradeRaw) => ({
+      ...acc,
+      [curr.ordertxid]: (acc[curr.ordertxid] ?? []).concat(
+        serializeTrade(curr)
+      ),
+    }),
+    {}
+  );
 };
 
 export const summarizeOrderTransactions = (
@@ -75,12 +75,12 @@ export const summarizeOrderTransactions = (
   return sumOrderTransactions;
 };
 
-export const getCryptoName = (coinName: string) => {
-  return coinName.replace(/(EUR|USD|USDT)$/g, "");
+export const getCryptoName = (pairName: string) => {
+  return pairName.replace(/(EUR|USD|USDT)$/g, "");
 };
 
-export const getMoneyName = (coinName: string) => {
-  return coinName.match(/(EUR|USD|USDT)$/g)?.[0] ?? "";
+export const getMoneyName = (pairName: string) => {
+  return pairName.match(/(EUR|USD|USDT)$/g)?.[0] ?? "";
 };
 
 type PairName = {
@@ -88,10 +88,10 @@ type PairName = {
   money: string;
 };
 
-export const splitPairName = (coinName: string): PairName => {
+export const splitPairName = (pairName: string): PairName => {
   return {
-    coin: getCryptoName(coinName),
-    money: getMoneyName(coinName),
+    coin: getCryptoName(pairName),
+    money: getMoneyName(pairName),
   };
 };
 
@@ -130,21 +130,23 @@ export const organizeWallet = (
 };
 
 type TotalBalance = {
-  totalSell: number;
-  totalBuy: number;
+  totalSell: Record<string, number>;
+  totalBuy: Record<string, number>;
 };
 
 export const getTotalBalance = (
   sumOrderTransactions: OrderTransactionSummarized[]
 ): TotalBalance => {
-  let buy = 0;
-  let sell = 0;
+  let buy: Record<string, number> = {};
+  let sell: Record<string, number> = {};
 
   for (let tx of sumOrderTransactions) {
     if (tx.type === "buy") {
-      buy += tx.totalCost;
+      buy[getMoneyName(tx.pair)] =
+        (buy[getMoneyName(tx.pair)] ?? 0) + tx.totalCost;
     } else {
-      sell += tx.totalCost;
+      sell[getMoneyName(tx.pair)] =
+        (sell[getMoneyName(tx.pair)] ?? 0) + tx.totalCost;
     }
   }
 

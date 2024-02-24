@@ -3,24 +3,38 @@ import Badge from "../components/badge";
 import useKraken from "../hooks/useKraken";
 import { getTotalBalance } from "../libs/krakenReader";
 import moment from "moment";
+import TextFormatter from "../libs/textFormatter";
 
 export default function TransactionListView() {
   const { sumTransactions } = useKraken();
 
-  const totalBalance = getTotalBalance(sumTransactions);
+  const { totalSell, totalBuy } = getTotalBalance(sumTransactions);
 
   return (
     <div className="flex flex-col items-center w-full px-20 mt-20">
       <div className="flex items-center pb-8">
-        <Badge
-          color="green"
-          title={`Total Buy: ${totalBalance.totalBuy.toFixed(
-            2
-          )} - Total Sell: ${totalBalance.totalSell.toFixed(2)}`}
-          className="text-3xl"
-        >
-          {(totalBalance.totalSell - totalBalance.totalBuy).toFixed(2)}
-        </Badge>
+        {Object.keys(totalSell).map((currency: string) => {
+          return (
+            <Badge
+              key={currency}
+              color={
+                totalSell[currency] - totalBuy[currency] > 0 ? "green" : "red"
+              }
+              title={new TextFormatter(
+                `Total Buy: %totalBuy% - Total Sell: %totalSell%`
+              ).format({
+                totalBuy: totalBuy[currency].toFixed(2),
+                totalSell: totalSell[currency].toFixed(2),
+              })}
+              className="text-3xl"
+            >
+              {new TextFormatter(`%currency%: %balance%`).format({
+                currency,
+                balance: (totalSell[currency] - totalBuy[currency]).toFixed(2),
+              })}
+            </Badge>
+          );
+        })}
       </div>
       <div className="flex w-full pb-20">
         <table className="table-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
