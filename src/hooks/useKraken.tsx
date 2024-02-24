@@ -5,7 +5,8 @@ import { TradeRaw } from "../types/trade";
 import {
   organizeWallet,
   summarizeOrderTransactions,
-  tradeRawToOrderTransactions,
+  tradesRawToMonthlyTrades,
+  tradesRawToOrderTransactions,
 } from "../libs/krakenReader";
 
 export default function useKraken() {
@@ -25,10 +26,12 @@ export default function useKraken() {
   const updateKrakenData = (result: ParseResult<TradeRaw>) => {
     setParsedData(result.data);
     setColumns(result.meta.fields ?? []);
-    const orderTransactions = tradeRawToOrderTransactions(result.data);
+    const orderTransactions = tradesRawToOrderTransactions(result.data);
     const sumOrderTransactions = summarizeOrderTransactions(orderTransactions);
     setSumTransactions(sumOrderTransactions);
     setWallet(organizeWallet(sumOrderTransactions));
+    const monthlyTrades = tradesRawToMonthlyTrades(result.data);
+    console.log(monthlyTrades);
   };
 
   const closeKrakenFile = () => {

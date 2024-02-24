@@ -1,22 +1,21 @@
+import moment from "moment";
 import {
   OrderTransactionSummarized,
   OrderTransactions,
 } from "../types/orderTransactions";
 import { OrganizedWallet } from "../types/organizedWallet";
-import { TradeRaw, serializeTrade } from "../types/trade";
+import { Trade, TradeRaw, serializeTrade } from "../types/trade";
 
-export const tradeRawToOrderTransactions = (
+export const tradesRawToOrderTransactions = (
   tradeRawRows: TradeRaw[]
 ): OrderTransactions => {
-  return tradeRawRows.reduce(
-    (acc: OrderTransactions, curr: TradeRaw) => ({
-      ...acc,
-      [curr.ordertxid]: (acc[curr.ordertxid] ?? []).concat(
-        serializeTrade(curr)
-      ),
-    }),
-    {}
-  );
+  return tradeRawRows.reduce((acc: OrderTransactions, curr: TradeRaw) => {
+    if (!acc[curr.ordertxid]) {
+      acc[curr.ordertxid] = [];
+    }
+    acc[curr.ordertxid].push(serializeTrade(curr));
+    return acc;
+  }, {});
 };
 
 export const summarizeOrderTransactions = (
@@ -154,4 +153,33 @@ export const getTotalBalance = (
     totalSell: sell,
     totalBuy: buy,
   };
+};
+
+type MonthlyTrades = Record<
+  string,
+  Record<string, OrderTransactionSummarized[]>
+>;
+
+export const tradesRawToMonthlyTrades = (trades: TradeRaw[]): MonthlyTrades => {
+  return trades.reduce((acc: MonthlyTrades, curr: TradeRaw) => {
+    const currentMonth = moment(curr.time).format("MM-yyyy");
+    const currentOrderTxId = curr.ordertxid;
+
+    if (!acc[currentMonth]) {
+      acc[currentMonth] = {};
+    }
+
+    if (!acc[currentMonth][currentOrderTxId]) {
+      acc[currentMonth] = {
+        ...acc[currentMonth],
+        [currentOrderTxId]: [],
+      };
+    }
+
+    acc[currentMonth][currentOrderTxId].push(
+      summarizeOrderTransactions(tradesRawToOrderTransactions(trade))
+    );
+
+    return acc;
+  }, {});
 };

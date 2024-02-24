@@ -65,11 +65,16 @@ export default function TransactionListView() {
                     </Badge>
                   </td>
                   <td
-                    title={`from: ${moment(transaction.startTime).format(
-                      "DD/MM/yyyy hh:mm:ss"
-                    )} - to: ${moment(transaction.endTime).format(
-                      "DD/MM/yyyy hh:mm:ss"
-                    )}`}
+                    title={new TextFormatter(
+                      `from: %start% - to: %end%`
+                    ).format({
+                      start: moment(transaction.startTime).format(
+                        "DD/MM/yyyy hh:mm:ss"
+                      ),
+                      end: moment(transaction.endTime).format(
+                        "DD/MM/yyyy hh:mm:ss"
+                      ),
+                    })}
                   >
                     {moment(transaction.startTime).format("DD/MM/yyyy")}
                   </td>
